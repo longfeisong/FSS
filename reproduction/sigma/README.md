@@ -23,20 +23,20 @@ The tested configuration is:
 ## Source setup
 
 ```bash
-git clone --recursive https://github.com/mpc-msri/EzPC.git third_party/EzPC
-git -C third_party/EzPC checkout f24bf3e
-git -C third_party/EzPC submodule update --init --recursive
+git clone --recurse-submodules git@github.com:longfeisong/FSS.git
+cd FSS
+git submodule update --init --recursive
 
-git -C third_party/EzPC apply \
-  ../../reproduction/sigma/patches/gpu-memory-pool.patch
-git -C third_party/EzPC/GPU-MPC/ext/sytorch/ext/sci/extern/SEAL apply \
-  ../../../../../../../../../reproduction/sigma/patches/seal-locks-mutex.patch
+git -C src/GPU-MPC/ext/sytorch/ext/sci/extern/SEAL apply \
+  ../../../../../../../../reproduction/sigma/patches/seal-locks-mutex.patch
 ```
 
-The first patch makes SIGMA's 40 GiB CUDA pool warm-up configurable with
-`SIGMA_GPU_POOL_GB`; setting it to zero skips only the warm-up allocation. The
-second patch supplies the `<mutex>` include required to compile the pinned old
-SEAL source with the current compiler.
+The checked-in GPU-MPC source already includes the memory-pool change. Its patch
+is retained under `reproduction/sigma/patches` for auditability. It makes
+SIGMA's 40 GiB CUDA pool warm-up configurable with `SIGMA_GPU_POOL_GB`; setting
+it to zero skips only the warm-up allocation. The SEAL submodule is immutable,
+so its patch must be applied after submodule initialization to supply the
+`<mutex>` include required by the current compiler.
 
 Build using the official instructions with these A100-specific variables:
 
@@ -46,29 +46,21 @@ export CUDA_VERSION=12.1
 export GPU_ARCH=80
 export CUDACXX=/usr/local/cuda-12.1/bin/nvcc
 
-cd third_party/EzPC/GPU-MPC
+cd src/GPU-MPC
 make sigma
 ```
 
-Copy the local experiment helpers next to the generated `sigma` executable:
-
-```bash
-cd /home/slf/LLM/FSS
-cp reproduction/sigma/scripts/run_local_auto.sh \
-  third_party/EzPC/GPU-MPC/experiments/sigma/
-cp reproduction/sigma/scripts/record_result.py \
-  third_party/EzPC/GPU-MPC/experiments/sigma/
-```
+The launcher and recorder are already checked in under
+`src/GPU-MPC/experiments/sigma`.
 
 ## Run and record
 
-From `third_party/EzPC/GPU-MPC/experiments/sigma`:
+From `src/GPU-MPC/experiments/sigma`:
 
 ```bash
 SIGMA_ALLOWED_GPUS=2,7 \
 SIGMA_GPU_POOL_GB=0 \
 SIGMA_MIN_FREE_MIB=6000 \
-SIGMA_RESULTS_DIR=/home/slf/LLM/FSS/reproduction/sigma/results \
 ./run_local_auto.sh bert-tiny 128 4
 ```
 
@@ -85,12 +77,13 @@ disables recording. Use `Ctrl+C` for normal interruption.
 
 ## Results
 
-- `output/P0` and `output/P1` preserve the artifact's original output directory
-  structure for the recorded baseline run.
-- `results/runs.csv` is the detailed, append-only machine-readable ledger.
-- `results/comparison.md` is generated from the CSV for quick inspection.
-- `results/raw/<run-id>/` preserves P0/P1 source statistics and metadata before
-  the next artifact run overwrites its output directory.
+- `src/GPU-MPC/experiments/sigma/output/P0` and `P1` preserve the artifact's
+  original output directory structure.
+- `src/GPU-MPC/experiments/sigma/results/runs.csv` is the detailed,
+  append-only machine-readable ledger.
+- `results/comparison.md` is generated from the CSV for quick inspection, and
+  `results/raw/<run-id>/` preserves P0/P1 statistics before the next run
+  overwrites the artifact output directory.
 
 The first run is a functional baseline only. Its timing is marked invalid
 because GPU 2 had 94% utilization at launch. Communication and key sizes remain

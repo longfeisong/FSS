@@ -1,0 +1,12 @@
+[submodule "src/GPU-MPC/experiments/orca/datasets/mnist"]
+	path = src/GPU-MPC/experiments/orca/datasets/mnist
+	url = https://github.com/neha-jawalkar/mnist.git
+[submodule "src/GPU-MPC/experiments/orca/weights"]
+	path = src/GPU-MPC/experiments/orca/weights
+	url = https://github.com/neha-jawalkar/weights.git
+[submodule "src/GPU-MPC/ext/cutlass"]
+	path = src/GPU-MPC/ext/cutlass
+	url = https://github.com/NVIDIA/cutlass.git
+[submodule "src/GPU-MPC/ext/sytorch/ext/sci/extern/SEAL"]
+	path = src/GPU-MPC/ext/sytorch/ext/sci/extern/SEAL
+	url = https://github.com/microsoft/SEAL.git
