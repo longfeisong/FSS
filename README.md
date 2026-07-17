@@ -23,6 +23,7 @@ execution, result interpretation, and the planned comparison methodology.
 ## Repository layout
 
 ```text
+src/GPU-MPC/             # Complete tracked GPU-MPC source snapshot
 reproduction/sigma/
 ├── patches/        # Minimal patches applied to the official SIGMA artifact
 ├── scripts/        # Local two-party launcher and result recorder
@@ -30,5 +31,6 @@ reproduction/sigma/
 └── results/        # Append-only ledger and archived raw statistics
 ```
 
-Third-party repositories, papers, binaries, build trees, and conda environments
-are deliberately excluded from version control.
+The GPU-MPC source is imported from EzPC commit `f24bf3e`; CUTLASS, SEAL and
+other large external dependencies remain pinned Git submodules. Papers,
+binaries, build trees, conda environments, and Git caches are excluded.

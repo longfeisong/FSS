@@ -1,1 +1,2 @@
 *.patch -whitespace
+src/GPU-MPC/** -whitespace

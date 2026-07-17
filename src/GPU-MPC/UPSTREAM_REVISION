@@ -1,0 +1,12 @@
+Repository: https://github.com/mpc-msri/EzPC.git
+Commit: f24bf3e022dde3493cf0ffe3ebd92dd73936b734
+Imported subtree: GPU-MPC
+
+Local changes:
+- configurable CUDA memory-pool warm-up in utils/gpu_mem.cu
+- shared-server launcher in experiments/sigma/run_local_auto.sh
+- automatic result recorder in experiments/sigma/record_result.py
+- archived BERT-Tiny sequence-128 P0/P1 output and experiment ledger
+
+The pinned SEAL submodule requires the compatibility patch stored at:
+reproduction/sigma/patches/seal-locks-mutex.patch
