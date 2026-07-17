@@ -26,6 +26,7 @@ execution, result interpretation, and the planned comparison methodology.
 reproduction/sigma/
 ├── patches/        # Minimal patches applied to the official SIGMA artifact
 ├── scripts/        # Local two-party launcher and result recorder
+├── output/         # Verbatim output tree produced by the SIGMA artifact
 └── results/        # Append-only ledger and archived raw statistics
 ```
 

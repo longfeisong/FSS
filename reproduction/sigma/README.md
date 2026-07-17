@@ -85,6 +85,8 @@ disables recording. Use `Ctrl+C` for normal interruption.
 
 ## Results
 
+- `output/P0` and `output/P1` preserve the artifact's original output directory
+  structure for the recorded baseline run.
 - `results/runs.csv` is the detailed, append-only machine-readable ledger.
 - `results/comparison.md` is generated from the CSV for quick inspection.
 - `results/raw/<run-id>/` preserves P0/P1 source statistics and metadata before
