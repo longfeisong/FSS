@@ -1,0 +1,2 @@
+run_id,timestamp,scheme,variant,component,model,layers,heads,hidden_size,ffn_hidden_size,seq_len,queries_per_block,chunk_size,chunks,lut_index_bits,lut_output_bits,padded_lut_entries,cpu_threads,protocol_ms,wall_ms,comm_bytes,correctness,timing_valid,notes
+20260717T171700-fable-gelu-block,2026-07-17T17:21:44+08:00,FABLE,gelu-correction-padded16,one-transformer-block-gelu-lut,bert-tiny,1,2,128,512,128,65536,4096,16,8,37,65536,16,75437,85000,19372844388,all-chunks-zero-error,provisional-shared-server,Official BatchPIR requires log-size 16; valid GELU indices remain 0..255.
