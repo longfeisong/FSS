@@ -1,0 +1,12 @@
+name: sigma-fable
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.10
+  - ninja
+  - mpfr
+  - openssl
+  - pip
+  - pip:
+      - cmake==3.27.9

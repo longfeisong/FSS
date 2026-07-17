@@ -1,0 +1,25 @@
+# Local papers and datasets
+data/
+*.pdf
+
+# Third-party source trees and build products
+third_party/
+build/
+cmake-build-*/
+*.o
+*.a
+*.so
+*.so.*
+*.cu.o
+
+# Python and local environments
+__pycache__/
+*.py[cod]
+.venv/
+.conda/
+
+# Editors and operating systems
+.vscode/
+.idea/
+.DS_Store
+*~
