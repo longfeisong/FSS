@@ -1,5 +1,5 @@
 diff --git a/src/GC/CMakeLists.txt b/src/GC/CMakeLists.txt
-index 95a2493..6e3cf33 100644
+index 95a2493..6e3cf33 100755
 --- a/src/GC/CMakeLists.txt
 +++ b/src/GC/CMakeLists.txt
 @@ -6,7 +6,7 @@ find_package(SEAL 4.1 QUIET PATHS "${PROJECT_SOURCE_DIR}/build/seal_4_1" NO_DEFA
