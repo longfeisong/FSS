@@ -24,7 +24,9 @@
     "values_checked": 393216,
     "mismatches": 0,
     "same_public_masked_input": true,
-    "bytes_sent_per_party": 3145736
+    "bytes_sent_per_party": 3145736,
+    "elapsed_us_p0": 59987,
+    "elapsed_us_p1": 18665
   },
   "sigma": {
     "layers": 1,
