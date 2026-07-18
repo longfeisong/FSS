@@ -1,0 +1,15 @@
+diff --git a/src/applications/CMakeLists.txt b/src/applications/CMakeLists.txt
+index 784d5d1..593d153 100644
+--- a/src/applications/CMakeLists.txt
++++ b/src/applications/CMakeLists.txt
+@@ -1,5 +1,9 @@
+ add_executable(embedding "embedding.cpp")
+ target_link_libraries(embedding fable-GC)
+ 
++add_executable(xlmr_embedding
++    "${CMAKE_SOURCE_DIR}/../../reproduction/xlmr_sigma/fable/xlmr_embedding.cpp")
++target_link_libraries(xlmr_embedding fable-GC)
++
+ add_executable(join "join.cpp")
+ target_link_libraries(join fable-GC)
+\ No newline at end of file

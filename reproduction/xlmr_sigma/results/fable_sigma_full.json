@@ -1,0 +1,62 @@
+{
+  "run_id": "20260718T084846-fable-xlmr-c0-n24",
+  "status": "pass",
+  "model": "FacebookAI/xlm-roberta-base",
+  "model_revision": "e73636d4f797dec63c3081bb6ed5c7b0bb3f2089",
+  "scope": "complete FABLE word embedding followed by XLM-R encoder layer 0 on all four 128-token sequences",
+  "lookup": {
+    "table_shape": [250002, 768],
+    "table_element": "signed int16, scale 12",
+    "queries": 512,
+    "unique_queries": 512,
+    "output_shape": [512, 768],
+    "output_chunks": 24,
+    "values_checked": 393216,
+    "mismatches": 0,
+    "fixed_min": -2528,
+    "fixed_max": 2612,
+    "wall_ms": 738922,
+    "p0_sent_bytes": 178699814952,
+    "p1_sent_bytes": 12812727388,
+    "total_sent_bytes": 191512542340
+  },
+  "fable_to_sigma_mask": {
+    "values_checked": 393216,
+    "mismatches": 0,
+    "same_public_masked_input": true,
+    "bytes_sent_per_party": 3145736
+  },
+  "sigma": {
+    "layers": 1,
+    "sequence_indices": [0, 1, 2, 3],
+    "sequence_batch_size": 4,
+    "sequence_length": 128,
+    "hidden_size": 768,
+    "attention_heads": 12,
+    "intermediate_size": 3072,
+    "fixed_point_scale": 12,
+    "ring_bitwidth": 50,
+    "weight_quantization": "truncate toward zero (Sytorch-compatible)",
+    "offline_key_bytes_per_party_per_sequence": 1507053568,
+    "offline_key_bytes_per_party_batch": 6028214272,
+    "online_elapsed_us_p0_batch": 5376038,
+    "online_elapsed_us_p1_batch": 5393042,
+    "online_communication_bytes_per_party_per_sequence": 88532558,
+    "online_communication_bytes_per_party_batch": 354130232,
+    "party_outputs_identical_all_sequences": true,
+    "zero_mask_oracle_identical_sequence_0": true,
+    "output_sha256_by_sequence": [
+      "6b22775a4f2b48e46c309e725d53975bdcf75f29253e30b3b77ddca3dd5d6422",
+      "bbca29ccb465fed740923e9eb26a9a94e5cb7a47f1c83d022cef340dcad8f39e",
+      "0462cab65736f508bd8ea7af0b870fb4d7c09f92412947902654201c0ff75d75",
+      "43258aa41c103057a12156d027999844fc9eefcafb375a241d21b4f82a4afa53"
+    ],
+    "timing_reliable": false,
+    "gpu_state_before": {
+      "A100-2": {"memory_used_mib": 33323, "memory_free_mib": 47831, "utilization_percent": 99},
+      "A100-7": {"memory_used_mib": 72881, "memory_free_mib": 8272, "utilization_percent": 0}
+    },
+    "timing_note": "SIGMA latency is correctness-only because A100-2 utilization exceeded 30%"
+  },
+  "semantic_boundary": "word embeddings feed the encoder directly; XLM-R position embeddings and embedding LayerNorm are not yet included"
+}

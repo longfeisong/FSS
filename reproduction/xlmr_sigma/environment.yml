@@ -1,0 +1,12 @@
+name: xlmr-sigma-bridge
+channels:
+  - conda-forge
+dependencies:
+  - python=3.10
+  - numpy=1.26
+  - pip
+  - pip:
+      - huggingface_hub==0.34.4
+      - safetensors==0.5.3
+      - sentencepiece==0.2.0
+      - transformers==4.53.2

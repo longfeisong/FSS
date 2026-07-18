@@ -1,0 +1,29 @@
+{
+  "scheme": "fable-xlmr-embedding-to-sigma",
+  "security": "semi-honest 2PC with dealer preprocessing",
+  "model": {
+    "id": "FacebookAI/xlm-roberta-base",
+    "revision": "e73636d4f797dec63c3081bb6ed5c7b0bb3f2089",
+    "vocab_size": 250002,
+    "hidden_size": 768,
+    "intermediate_size": 3072,
+    "num_hidden_layers": 12,
+    "num_attention_heads": 12,
+    "max_position_embeddings": 514
+  },
+  "experiment": {
+    "sequence_length": 128,
+    "sequence_batch_size": 4,
+    "lookup_batch_size": 512,
+    "embedding_element_bits": 16,
+    "fixed_point_scale": 12,
+    "sigma_bitwidth": 50,
+    "fable_input_bits": 20,
+    "fable_domain_size": 1048576
+  },
+  "provenance": {
+    "sigma_profile": "bert-base, sequence length 128",
+    "fable_profile": "embedding.cpp: input_bits=20, bits_per_element=16, words_per_batch=512",
+    "note": "XLM-R-base itself was not evaluated by SIGMA. Its encoder dimensions match SIGMA's BERT-base profile."
+  }
+}
