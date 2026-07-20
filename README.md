@@ -28,6 +28,11 @@ blocks without revealing the embedding.
 - The complete 24-chunk, 512×768 private embedding passes with zero mismatches
   and feeds a real XLM-R block; the masked output is bit-identical to a zero-mask
   SIGMA correctness oracle.
+- The secure SS-LinearScan comparison baseline now implements blockwise
+  one-hot/table secret sharing, fresh Beaver matrix triples, fail-closed triple
+  consumption, exact A100 Tensor Core arithmetic in `Z_(2^50)`, and the same
+  share-to-SIGMA output contract. The full 512×768 lookup and all four XLM-R
+  Layer 0 sequences pass, with output hashes identical to FABLE+SIGMA.
 
 See [`reproduction/sigma/README.md`](reproduction/sigma/README.md) for setup,
 execution, and SIGMA results. See

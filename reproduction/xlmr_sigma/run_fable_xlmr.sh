@@ -5,7 +5,15 @@ SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 ROOT_DIR="$(cd -- "$SCRIPT_DIR/../.." && pwd)"
 FABLE_DIR="$ROOT_DIR/src/FABLE"
 BINARY="$FABLE_DIR/build-xlmr/bin/xlmr_embedding"
-CONDA_PREFIX_PATH="${CONDA_PREFIX:-/home/slf/anaconda3/envs/sigma-fable}"
+ENV_NAME="${FABLE_CONDA_ENV:-sigma-fable}"
+if [[ "${CONDA_DEFAULT_ENV:-}" == "$ENV_NAME" && -n "${CONDA_PREFIX:-}" ]]; then
+    CONDA_PREFIX_PATH="$CONDA_PREFIX"
+elif command -v conda >/dev/null 2>&1; then
+    CONDA_PREFIX_PATH="$(conda run -n "$ENV_NAME" bash -c 'printf %s "$CONDA_PREFIX"')"
+else
+    printf 'Activate Conda environment %s or make conda available in PATH.\n' "$ENV_NAME" >&2
+    exit 1
+fi
 LIBOTE_PREFIX="$ROOT_DIR/third_party/libOTe/install"
 MODEL_ARTIFACTS="${XLMR_ARTIFACTS_DIR:-$SCRIPT_DIR/artifacts}"
 TABLE="${XLMR_FABLE_TABLE:-$MODEL_ARTIFACTS/fable-table/xlmr_word_embedding_scale12.i16}"
@@ -13,6 +21,8 @@ QUERIES="${XLMR_TOKEN_IDS:-$MODEL_ARTIFACTS/plaintext-bridge-smoke/token_ids.u32
 CHUNK_START="${1:-0}"
 CHUNK_COUNT="${2:-1}"
 THREADS="${FABLE_THREADS:-32}"
+P0_CPUSET="${FABLE_P0_CPUSET:-}"
+P1_CPUSET="${FABLE_P1_CPUSET:-}"
 PORT="${FABLE_XLMR_PORT:-18800}"
 RUN_ID="$(date +%Y%m%dT%H%M%S)-fable-xlmr-c${CHUNK_START}-n${CHUNK_COUNT}"
 RUN_DIR="$SCRIPT_DIR/artifacts/fable-xlmr/$RUN_ID"
@@ -52,13 +62,22 @@ SERVER_LOG="$RUN_DIR/P0.log"
 CLIENT_LOG="$RUN_DIR/P1.log"
 
 start_ms="$(date +%s%3N)"
-"$BINARY" 127.0.0.1 r=1 p="$PORT" par=1 thr="$THREADS" \
+pin() {
+    local cpuset="$1"
+    shift
+    if [[ -n "$cpuset" ]]; then
+        taskset -c "$cpuset" "$@"
+    else
+        "$@"
+    fi
+}
+pin "$P0_CPUSET" "$BINARY" 127.0.0.1 r=1 p="$PORT" par=1 thr="$THREADS" \
     chunk_start="$CHUNK_START" chunk_count="$CHUNK_COUNT" \
     table="$TABLE" queries="$QUERIES" output="$SERVER_SHARE" \
     >"$SERVER_LOG" 2>&1 &
 server_pid=$!
 sleep 0.5
-"$BINARY" 127.0.0.1 r=2 p="$PORT" par=1 thr="$THREADS" \
+pin "$P1_CPUSET" "$BINARY" 127.0.0.1 r=2 p="$PORT" par=1 thr="$THREADS" \
     chunk_start="$CHUNK_START" chunk_count="$CHUNK_COUNT" \
     table="$TABLE" queries="$QUERIES" output="$CLIENT_SHARE" \
     >"$CLIENT_LOG" 2>&1

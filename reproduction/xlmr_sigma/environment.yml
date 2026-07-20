@@ -4,6 +4,7 @@ channels:
 dependencies:
   - python=3.10
   - numpy=1.26
+  - psutil>=5.9
   - pip
   - pip:
       - huggingface_hub==0.34.4

@@ -21,6 +21,27 @@
     "fable_input_bits": 20,
     "fable_domain_size": 1048576
   },
+  "lookup_contract": {
+    "logical_table_shape": [250002, 768],
+    "query_count": 512,
+    "output_shape": [512, 768],
+    "ring_bits": 50,
+    "fixed_point_scale": 12,
+    "output_relation": "P0_share + P1_share = table[private_ids] mod 2^50",
+    "intermediate_reconstruction": false
+  },
+  "secure_baseline": {
+    "name": "SS-LinearScan",
+    "protocol": "dealer-assisted Beaver matrix multiplication",
+    "row_block": 4096,
+    "one_hot_scale": 0,
+    "lookup_truncation": "none",
+    "table_shares_reusable": true,
+    "triples_reusable": false,
+    "backend": "torch-int8-tensorcore-u50 on NVIDIA Ampere GPUs",
+    "validated_device": "NVIDIA A100-SXM4-80GB",
+    "gpu_backend_status": "full-scale A100 correctness pass; RTX 3090 smoke test required"
+  },
   "provenance": {
     "sigma_profile": "bert-base, sequence length 128",
     "fable_profile": "embedding.cpp: input_bits=20, bits_per_element=16, words_per_batch=512",
