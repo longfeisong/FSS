@@ -1,0 +1,79 @@
+diff --git a/src/GC/CMakeLists.txt b/src/GC/CMakeLists.txt
+index 95a2493..6e3cf33 100755
+--- a/src/GC/CMakeLists.txt
++++ b/src/GC/CMakeLists.txt
+@@ -6,7 +6,7 @@ find_package(SEAL 4.1 QUIET PATHS "${PROJECT_SOURCE_DIR}/build/seal_4_1" NO_DEFA
+ 
+ if (NOT SEAL_FOUND)
+     message(STATUS "clone and install SEAL locally")
+-    execute_process(COMMAND ${CMAKE_COMMAND} -E env CC=clang CXX=clang++ ${CMAKE_COMMAND} -S . -B ${PROJECT_SOURCE_DIR}/extern/SEAL/build -DSEAL_USE_GAUSSIAN_NOISE=ON -DCMAKE_INSTALL_PREFIX=${PROJECT_SOURCE_DIR}/build/seal_4_1
++    execute_process(COMMAND ${CMAKE_COMMAND} -E env CC=clang CXX=clang++ ${CMAKE_COMMAND} -S . -B ${PROJECT_SOURCE_DIR}/extern/SEAL/build -DSEAL_USE_GAUSSIAN_NOISE=ON -DSEAL_THROW_ON_TRANSPARENT_CIPHERTEXT=OFF -DCMAKE_INSTALL_PREFIX=${PROJECT_SOURCE_DIR}/build/seal_4_1
+         WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}/extern/SEAL")
+     execute_process(COMMAND ${CMAKE_COMMAND} --build ./build --target install --parallel
+         WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}/extern/SEAL")
+diff --git a/src/LUT_utils.h b/src/LUT_utils.h
+index a269341..b26da7c 100644
+--- a/src/LUT_utils.h
++++ b/src/LUT_utils.h
+@@ -9,6 +9,7 @@ enum LUTType {
+ 	Gamma, 
+ 	Cauchy_dis, 
+     Filled, 
++	GeluCorrection,
+     NumLUTTypes
+ };
+ 
+@@ -22,6 +23,8 @@ inline std::string lut_type_to_string(LUTType lut_typ) {
+         return "Cauchy_dis";
+     else if (lut_typ == Filled)
+         return "Filled";
++	else if (lut_typ == GeluCorrection)
++		return "GeluCorrection";
+     else
+         return "Invalid";
+ }
+@@ -63,12 +66,21 @@ inline std::vector<uint64_t> get_lut_vec(const LUTType lut_typ, uint64_t lut_siz
+ 			rel_error[i] = abs_error[i] / value;
+ 		} else if (lut_typ == Filled) {
+             lut[i] = output_bits == 64 ? UINT64_MAX : (1LL << output_bits) - 1;
+-        } else if (lut_typ == Cauchy_dis) {
++		} else if (lut_typ == Cauchy_dis) {
+ 			double input = (double)i/lut_size * 80 - 40; // from -40 to 40
+ 			double value = 1.0 / (M_PI * (1 + input * input));
+ 			lut[i] = ftoi(value, range, 0.35);
+ 			abs_error[i] = abs(itof(lut[i], range, 0.35) - value);
+ 			rel_error[i] = abs_error[i] / value;
++		} else if (lut_typ == GeluCorrection) {
++			// Match SIGMA's 8-bit reluSubGelu LUT exactly: the index has
++			// six fractional bits and the result has scale 2^12.
++			constexpr int input_scale = 6;
++			constexpr int output_scale = 12;
++			double input = static_cast<double>(i) / (1ULL << input_scale);
++			double gelu = input * 0.5 * (1.0 + std::erf(input / std::sqrt(2.0)));
++			double correction = std::max(0.0, input) - gelu;
++			lut[i] = static_cast<uint64_t>(correction * (1ULL << output_scale));
+ 		} else {
+ 			throw std::invalid_argument("LUT Type is not supported. ");
+ 		}
+diff --git a/src/bench_fable.cpp b/src/bench_fable.cpp
+index f978989..ac5fb45 100644
+--- a/src/bench_fable.cpp
++++ b/src/bench_fable.cpp
+@@ -38,11 +38,14 @@ void bench_lut() {
+ 
+ 	start_record(io_gc, "Input Preparation");
+ 	// preparing queries
+-    vector<uint64_t> plain_queries(batch_size);
+-    vector<Integer> secret_queries;
++	vector<uint64_t> plain_queries(batch_size);
++	vector<Integer> secret_queries;
++	const uint64_t query_domain = lut_type == LUTType::GeluCorrection
++		? std::min<uint64_t>(256, lut.size())
++		: lut.size();
+     for (int i = 0; i < batch_size; i++) {
+ 		if (i < (batch_size + 1) / 2) {
+-			plain_queries[i] = rand() % lut.size(); 
++			plain_queries[i] = rand() % query_domain;
+ 		} else {
+ 			plain_queries[i] = plain_queries[rand() % ((batch_size + 1) / 2)]; // Force duplicates. 
+ 		}

@@ -1,0 +1,17 @@
+{
+  "status": "success",
+  "source": "FacebookAI/xlm-roberta-base",
+  "revision": "e73636d4f797dec63c3081bb6ed5c7b0bb3f2089",
+  "source_model_safetensors_sha256": "6fd4797bc397c3b8b55d6bb5740366b57e6a3ce91c04c77f22aafc0c128e6feb",
+  "target": "SIGMA Sytorch GPUBERT(12, 12, 768, qkvconcat)",
+  "parameter_count": 85054464,
+  "output_bytes": 340217856,
+  "output_sha256": "54b719a23e4b04f4dad395ca9218829007bb31376981cea3cd5fd962eae38743",
+  "excluded": [
+    "word embeddings",
+    "position embeddings",
+    "token-type embeddings",
+    "embedding LayerNorm",
+    "masked-LM head"
+  ]
+}

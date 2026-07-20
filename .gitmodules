@@ -10,3 +10,6 @@
 [submodule "src/GPU-MPC/ext/sytorch/ext/sci/extern/SEAL"]
 	path = src/GPU-MPC/ext/sytorch/ext/sci/extern/SEAL
 	url = https://github.com/microsoft/SEAL.git
+[submodule "src/FABLE"]
+	path = src/FABLE
+	url = https://github.com/timzsu/FABLE.git

@@ -113,6 +113,9 @@ sigma: experiments/sigma/sigma.cu
 sigma_correctness: experiments/sigma/sigma.cu 
 	$(CXX) $(FLAGS) -DCORRECTNESS=1 $(INCLUDES) $^ $(UTIL_FILES) $(LIBS) -o experiments/sigma/sigma
 
+sigma_xlmr: ../../reproduction/xlmr_sigma/sigma_xlmr.cu
+	$(CXX) $(FLAGS) $(INCLUDES) $^ $(UTIL_FILES) $(LIBS) -o experiments/sigma/sigma_xlmr
+
 piranha: experiments/orca/piranha.cu 
 	$(CXX) $(FLAGS) $(INCLUDES) $^ $(UTIL_FILES) $(LIBS) -o experiments/orca/piranha
 

@@ -17,6 +17,11 @@ __pycache__/
 *.py[cod]
 .venv/
 .conda/
+.cache/
+
+# Downloaded model weights and generated protocol inputs
+reproduction/xlmr_sigma/artifacts/
+reproduction/xlmr_sigma/models/
 
 # Editors and operating systems
 .vscode/

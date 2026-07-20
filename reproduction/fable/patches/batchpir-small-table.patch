@@ -1,0 +1,52 @@
+diff --git a/header/utils.h b/header/utils.h
+index f606d62..ba55944 100644
+--- a/header/utils.h
++++ b/header/utils.h
+@@ -5,6 +5,7 @@
+ #include <cstdlib>
+ #include <ctime>
+ #include <fmt/core.h>
++#include <fmt/format.h>
+ #include <iostream>
+ #include <cstdint>
+ #include <string>
+diff --git a/src/batchpirserver.cpp b/src/batchpirserver.cpp
+index 0e1ca38..2ac5f47 100644
+--- a/src/batchpirserver.cpp
++++ b/src/batchpirserver.cpp
+@@ -321,6 +321,10 @@ vector<PIRResponseList> BatchPIRServer::generate_response(uint32_t client_id, ve
+     size_t num_subbucket = PolyDegree / num_buckets;
+     size_t subbucket_size = ceil(bucket_size * 1.0 / num_subbucket);
+     size_t num_tasks_per_group = ceil(subbucket_size * 1.0 / NumTaskGroups);
++    size_t num_active_task_groups =
++        std::min<size_t>(NumTaskGroups,
++                         (subbucket_size + num_tasks_per_group - 1) /
++                             num_tasks_per_group);
+     const auto m = batchpir_params_->get_PIRANA_m();
+     const auto w = NumHashFunctions;
+     const auto num_columns_per_entry = batchpir_params_->get_num_slots_per_entry();
+@@ -338,15 +342,20 @@ vector<PIRResponseList> BatchPIRServer::generate_response(uint32_t client_id, ve
+ 
+     for (int hash_idx = 0; hash_idx < w; hash_idx++) {
+         if (type == PIRANA) {
+-            vector<PIRResponseList> masked_value(num_columns_per_entry, PIRResponseList(NumTaskGroups));
++            vector<PIRResponseList> masked_value(
++                num_columns_per_entry,
++                PIRResponseList(num_active_task_groups));
+ 
+             #pragma omp parallel for if(parallel) num_threads(num_threads)
+-            for (int thread_idx = 0; thread_idx < NumTaskGroups; thread_idx++) {
++            for (int thread_idx = 0; thread_idx < num_active_task_groups; thread_idx++) {
+                 size_t col_start = thread_idx * num_tasks_per_group;
+                 size_t col_end = std::min((thread_idx + 1) * num_tasks_per_group, subbucket_size);
+ 
+-                for (int sub_column=0; sub_column < col_end - col_start; sub_column++) {
+-                    int column = col_start + sub_column;
++                if (col_start >= col_end)
++                    continue;
++
++                for (size_t column = col_start; column < col_end; column++) {
++                    size_t sub_column = column - col_start;
+                     utils::check(column < subbucket_size, fmt::format("Column {}={}+{} out of range", column, col_start, sub_column)); 
+                     Ciphertext mask;
+ 

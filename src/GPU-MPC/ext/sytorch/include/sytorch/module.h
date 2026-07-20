@@ -428,6 +428,55 @@ public:
         }
     }
 
+    // Load an already-quantized ring stream.  This is used by SIGMA when the
+    // dealer consumes parameter masks and the evaluators consume the matching
+    // public masked parameters; converting through float would lose 50-bit
+    // ring values.
+    void loadring(const std::string weightsFile)
+    {
+        size_t size_in_bytes = std::filesystem::file_size(weightsFile);
+        always_assert(size_in_bytes % sizeof(T) == 0);
+        size_t numParameters = size_in_bytes / sizeof(T);
+        std::ifstream file(weightsFile, std::ios::binary);
+        always_assert(file.good());
+        size_t wIdx = 0;
+
+        auto readTensor = [&](T *destination, size_t count)
+        {
+            always_assert(wIdx + count <= numParameters);
+            file.read((char *)destination, count * sizeof(T));
+            always_assert(file.good());
+            wIdx += count;
+        };
+
+        for (auto &node : allNodesInExecutionOrder)
+        {
+            auto layer = node->layer;
+            if (layer->name == "_MHADummy")
+            {
+                auto mha = (_MHADummy<T> *)layer;
+                always_assert(mha->qkvLayout == "qkvconcat");
+                readTensor(mha->wQKV.data, mha->wQKV.size());
+                readTensor(mha->bQKV.data, mha->bQKV.size());
+                readTensor(mha->wProj.data, mha->wProj.size());
+                readTensor(mha->bProj.data, mha->bProj.size());
+            }
+            else
+            {
+                auto weights = layer->getweights();
+                readTensor(weights.data, weights.size);
+                auto bias = layer->getbias();
+                if (layer->useBias)
+                    readTensor(bias.data, bias.size);
+                else
+                    bias.zero();
+            }
+        }
+        always_assert(wIdx == numParameters);
+        file.close();
+        printf("Loaded %lu ring parameters from %s\n", wIdx, weightsFile.data());
+    }
+
     Tensor<T> &add(std::vector<Tensor<T> *> &arr)
     {
         if (arr[0]->graphGenMode)
