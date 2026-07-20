@@ -16,10 +16,10 @@ if ss -ltn | awk '{print $4}' | rg -q ":${PORT}$"; then
 fi
 
 mkdir -p "$OUT_DIR"
-conda run -n xlmr-sigma-bridge python "$SCRIPT_DIR/generate_sigma_input_masks.py" \
+conda run -n sigma-fable python "$SCRIPT_DIR/generate_sigma_input_masks.py" \
     --output-dir "$MASK_DIR" >"$OUT_DIR/dealer.log"
 
-conda run -n xlmr-sigma-bridge python "$SCRIPT_DIR/share_to_sigma_masked.py" \
+conda run -n sigma-fable python "$SCRIPT_DIR/share_to_sigma_masked.py" \
     --party 0 --port "$PORT" \
     --share "$FABLE_RUN_DIR/P0-share.u64" \
     --mask-share "$MASK_DIR/P0-mask-share.u64" \
@@ -27,7 +27,7 @@ conda run -n xlmr-sigma-bridge python "$SCRIPT_DIR/share_to_sigma_masked.py" \
 p0_pid=$!
 trap 'kill "$p0_pid" 2>/dev/null || true' EXIT INT TERM
 
-conda run -n xlmr-sigma-bridge python "$SCRIPT_DIR/share_to_sigma_masked.py" \
+conda run -n sigma-fable python "$SCRIPT_DIR/share_to_sigma_masked.py" \
     --party 1 --port "$PORT" \
     --share "$FABLE_RUN_DIR/P1-share.u64" \
     --mask-share "$MASK_DIR/P1-mask-share.u64" \
@@ -35,7 +35,7 @@ conda run -n xlmr-sigma-bridge python "$SCRIPT_DIR/share_to_sigma_masked.py" \
 wait "$p0_pid"
 trap - EXIT INT TERM
 
-conda run -n xlmr-sigma-bridge python "$SCRIPT_DIR/verify_sigma_input_bridge.py" \
+conda run -n sigma-fable python "$SCRIPT_DIR/verify_sigma_input_bridge.py" \
     --share0 "$FABLE_RUN_DIR/P0-share.u64" \
     --share1 "$FABLE_RUN_DIR/P1-share.u64" \
     --dealer-mask "$MASK_DIR/dealer-input-mask.u64" \

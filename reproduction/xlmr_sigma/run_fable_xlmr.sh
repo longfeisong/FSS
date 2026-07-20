@@ -87,7 +87,7 @@ wall_ms=$(($(date +%s%3N) - start_ms))
 rg -q 'FABLE-to-SIGMA share bridge passed' "$SERVER_LOG"
 rg -q 'FABLE-to-SIGMA share bridge passed' "$CLIENT_LOG"
 
-conda run -n xlmr-sigma-bridge python "$SCRIPT_DIR/verify_fable_sigma_shares.py" \
+conda run -n "$ENV_NAME" python "$SCRIPT_DIR/verify_fable_sigma_shares.py" \
     --table "$TABLE" --queries "$QUERIES" \
     --share0 "$SERVER_SHARE" --share1 "$CLIENT_SHARE" \
     --chunk-start "$CHUNK_START" --chunk-count "$CHUNK_COUNT" \

@@ -64,11 +64,12 @@ share before exchange. Neither party learns `x` or the full `r`.
 
 ## Setup
 
-Create the small CPU-only preprocessing environment:
+Install or update the Python preprocessing dependencies in the shared
+`sigma-fable` environment:
 
 ```bash
-conda env create -f reproduction/xlmr_sigma/environment.yml
-conda activate xlmr-sigma-bridge
+conda env update -n sigma-fable -f reproduction/xlmr_sigma/environment.yml --prune
+conda activate sigma-fable
 ```
 
 Download the pinned public model snapshot. The 1.1 GiB weights are stored under
@@ -89,12 +90,12 @@ model.safetensors sha256:
 ## Prepare the model and 512-query workload
 
 ```bash
-conda run -n xlmr-sigma-bridge \
+conda run -n sigma-fable \
   python reproduction/xlmr_sigma/prepare_bridge.py \
   --model-dir .cache/models/xlm-roberta-base \
   --output-dir reproduction/xlmr_sigma/artifacts/plaintext-bridge-smoke
 
-conda run -n xlmr-sigma-bridge \
+conda run -n sigma-fable \
   python reproduction/xlmr_sigma/verify_bridge.py \
   reproduction/xlmr_sigma/artifacts/plaintext-bridge-smoke
 ```
@@ -119,7 +120,7 @@ Export the 12 XLM-R encoder layers in the exact float stream consumed by
 `SytorchModule::load` and SIGMA's `GPUBERT` graph:
 
 ```bash
-conda run -n xlmr-sigma-bridge \
+conda run -n sigma-fable \
   python reproduction/xlmr_sigma/export_sytorch_encoder.py \
   --model-dir .cache/models/xlm-roberta-base \
   --output-dir reproduction/xlmr_sigma/artifacts/sytorch-encoder
@@ -160,7 +161,7 @@ Export the 250,002 x 768 table as signed int16 at scale 12, then build the
 FABLE application at the author-used 20-bit input and 512-bit output profile:
 
 ```bash
-conda run -n xlmr-sigma-bridge python \
+conda run -n sigma-fable python \
   reproduction/xlmr_sigma/export_fable_table.py \
   --model-dir .cache/models/xlm-roberta-base \
   --output-dir reproduction/xlmr_sigma/artifacts/fable-table
@@ -360,13 +361,13 @@ parameters are quantized in their correct Sytorch order, then separated into a
 dealer-only parameter mask and evaluator-visible masked parameters:
 
 ```bash
-conda run -n xlmr-sigma-bridge python \
+conda run -n sigma-fable python \
   reproduction/xlmr_sigma/export_sytorch_encoder.py \
   --model-dir .cache/models/xlm-roberta-base \
   --output-dir reproduction/xlmr_sigma/artifacts/sytorch-encoder \
   --layers 1
 
-conda run -n xlmr-sigma-bridge python \
+conda run -n sigma-fable python \
   reproduction/xlmr_sigma/prepare_sigma_weights.py \
   --float-weights reproduction/xlmr_sigma/artifacts/sytorch-encoder/xlmr_encoder_1layer_sytorch.float32 \
   --manifest reproduction/xlmr_sigma/artifacts/sytorch-encoder/xlmr_encoder_1layer_sytorch.manifest.json \

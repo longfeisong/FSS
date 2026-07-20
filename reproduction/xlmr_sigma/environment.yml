@@ -1,4 +1,4 @@
-name: xlmr-sigma-bridge
+name: sigma-fable
 channels:
   - conda-forge
 dependencies:
